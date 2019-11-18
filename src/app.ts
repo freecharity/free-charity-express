@@ -7,6 +7,7 @@ import { PORT, API_KEY } from "./util/secrets";
 // Controllers (route handlers)
 import * as homeController from "./controllers/home";
 import * as questionController from "./controllers/question";
+import * as answerController from "./controllers/answers";
 
 // Create Express server
 const app = express();
@@ -24,5 +25,10 @@ app.get("/questions", questionController.get);
 app.post("/questions", questionController.post);
 app.put("/questions", questionController.put);
 app.delete("/questions", questionController.remove);
+
+app.get("/answers", answerController.get);
+app.post("/answers", answerController.post);
+app.put("/answers", answerController.put);
+app.delete("/answers", answerController.remove);
 
 export default app;
