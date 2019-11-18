@@ -1,0 +1,17 @@
+# Build
+/dist
+
+# API keys and secrets
+.env
+
+# Dependency directories
+/node_modules
+
+# OS metadata
+.DS_Store
+
+# Logs
+debug.log
+
+# .idea project configurations
+.idea
