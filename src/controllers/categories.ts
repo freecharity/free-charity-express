@@ -7,16 +7,20 @@ import {connection} from '../util/database';
  * Retrieve all categories from database
  */
 export const get = (req: Request, res: Response) => {
-    const category = req.query.categoryName;
+    const categoryName = req.query.categoryName;
+    const categoryId = req.query.categoryId;
     const sqlQuery = `
     SELECT category_id,
-        category_name,
-        category_group,
-        category_description,
-        category_image
+        \`name\`,
+        \`group\`,
+        \`description\`,
+        \`image\`,
+        \`deleted\`
     FROM category
-    ${category != undefined ? `WHERE category_name = '${category}'` : ''};
-    `;
+    WHERE deleted != 1
+    ${categoryName != undefined ? `AND name = '${categoryName}'` : ''}
+    ${categoryId != undefined ? `AND category_id = '${categoryId}'` : ''}
+    ;`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).send(error);
@@ -25,10 +29,11 @@ export const get = (req: Request, res: Response) => {
             for (let i = 0; i < results.length; i++) {
                 const category: Category = {
                     category_id: results[i].category_id,
-                    category_name: results[i].category_name,
-                    category_group: results[i].category_group,
-                    category_description: results[i].category_description,
-                    category_image: results[i].category_image
+                    name: results[i].name,
+                    group: results[i].group,
+                    description: results[i].description,
+                    image: results[i].image,
+                    deleted: results[i].deleted == 1
                 };
                 categories.push(category);
             }
@@ -36,7 +41,6 @@ export const get = (req: Request, res: Response) => {
         }
     });
 };
-
 
 /**
  * POST /categories/
@@ -46,15 +50,17 @@ export const post = (req: Request, res: Response) => {
     const category: Category = req.body;
     const sqlQuery = `
     INSERT INTO category(
-        category_name,
-        category_group,
-        category_description,
-        category_image
+        \`name\`,
+        \`group\`,
+        \`description\`,
+        \`image\`,
+        \`deleted\`
     ) VALUES (
-        '${category.category_name}',
-        '${category.category_group}',
-        '${category.category_description}',
-        '${category.category_image}'
+        '${category.name}',
+        '${category.group}',
+        '${category.description}',
+        '${category.image}',
+        '${category.deleted}'
     );
     `;
     connection.query(sqlQuery, (error, results, fields) => {
@@ -74,10 +80,32 @@ export const put = (req: Request, res: Response) => {
     const category: Category = req.body;
     const sqlQuery = `
     UPDATE category
-    SET category_group = 'category_group_value',
-        category_description = 'category_description_value',
-        category_image = 'category_image_value'
-    WHERE category_id = 1;
+    SET \`name\` = '${category.name}',
+        \`group\` = '${category.group}',
+        \`description\` = '${category.description}',
+        \`image\` = '${category.image}',
+        \`deleted\` = '${category.deleted ? 1 : 0}'
+    WHERE \`category_id\` = ${category.category_id};
+    `;
+    connection.query(sqlQuery, (error, results, fields) => {
+        if (error) {
+            res.status(400).json(error);
+        } else {
+            res.status(200).json(results);
+        }
+    });
+};
+
+/**
+ * DELETE /categories/
+ * Delete a category record with the following id
+ */
+export const remove = (req: Request, res: Response) => {
+    const categoryId = req.query.categoryId;
+    const sqlQuery = `
+    UPDATE category
+    SET \`deleted\` = 1
+    WHERE \`category_id\` = ${categoryId};
     `;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
