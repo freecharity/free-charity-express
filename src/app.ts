@@ -9,6 +9,7 @@ import * as homeController from "./controllers/home";
 import * as questionController from "./controllers/question";
 import * as answerController from "./controllers/answers";
 import * as categoryController from "./controllers/categories";
+import * as userController from "./controllers/users";
 
 // Create Express server
 const app = express();
@@ -35,6 +36,10 @@ app.delete("/answers", answerController.remove);
 app.get("/categories", categoryController.get);
 app.post("/categories", categoryController.post);
 app.put("/categories", categoryController.put);
+
+app.get('/users', userController.get);
+app.post('/users', userController.post);
+app.put('/users', userController.put);
 
 
 export default app;

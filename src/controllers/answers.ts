@@ -11,8 +11,7 @@ export const get = (req: Request, res: Response) => {
     const userId = req.query.userId;
     const correct = req.query.correct != undefined;
     let sqlQuery = `
-    SELECT
-        answer_id,
+    SELECT answer_id,
         ip_address,
         correct,
         answer,
