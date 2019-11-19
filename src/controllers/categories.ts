@@ -7,6 +7,7 @@ import {connection} from '../util/database';
  * Retrieve all categories from database
  */
 export const get = (req: Request, res: Response) => {
+    const page = req.query.page;
     const categoryName = req.query.categoryName;
     const categoryId = req.query.categoryId;
     const sqlQuery = `
@@ -37,7 +38,14 @@ export const get = (req: Request, res: Response) => {
                 };
                 categories.push(category);
             }
-            res.status(200).send(categories);
+
+            const startIndex = (page-1) * 10;
+            const endIndex = (page*10) - 1;
+            res.status(200).send({
+                page: page,
+                total: categories.length,
+                results: categories.splice(startIndex, 10)
+            });
         }
     });
 };
@@ -61,8 +69,7 @@ export const post = (req: Request, res: Response) => {
         '${category.description}',
         '${category.image}',
         '${category.deleted}'
-    );
-    `;
+    );`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).send(error);
@@ -85,8 +92,8 @@ export const put = (req: Request, res: Response) => {
         \`description\` = '${category.description}',
         \`image\` = '${category.image}',
         \`deleted\` = '${category.deleted ? 1 : 0}'
-    WHERE \`category_id\` = ${category.category_id};
-    `;
+    WHERE \`category_id\` = ${category.category_id}
+    ;`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).json(error);
@@ -105,8 +112,8 @@ export const remove = (req: Request, res: Response) => {
     const sqlQuery = `
     UPDATE category
     SET \`deleted\` = 1
-    WHERE \`category_id\` = ${categoryId};
-    `;
+    WHERE \`category_id\` = ${categoryId}
+    ;`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).json(error);
