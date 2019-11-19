@@ -1,6 +1,7 @@
 import express from "express";
 import compression from "compression";
 import bodyParser from "body-parser";
+import cors, { CorsOptions } from "cors";
 
 import { PORT, API_KEY } from "./util/secrets";
 
@@ -14,11 +15,28 @@ import * as userController from "./controllers/users";
 // Create Express server
 const app = express();
 
+// Domain Whitelist
+const whitelist = [
+    "http://jefthimi.net/",
+    "http://www.jefthimi.net/",
+    "http://localhost:8080"
+];
+const corsOptions: CorsOptions = {
+    origin: (origin, callback) => {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(null, false);
+        }
+    }
+};
+
 // Express configuration
 app.set("port", PORT);
 app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
 
 /**
  * Server routes.
@@ -36,10 +54,12 @@ app.delete("/answers", answerController.remove);
 app.get("/categories", categoryController.get);
 app.post("/categories", categoryController.post);
 app.put("/categories", categoryController.put);
+app.delete("/categories", categoryController.remove);
 
 app.get('/users', userController.get);
 app.post('/users', userController.post);
 app.put('/users', userController.put);
+
 
 
 export default app;
