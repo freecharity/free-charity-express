@@ -7,9 +7,12 @@ import {connection} from '../util/database';
  * Retrieve all categories from database
  */
 export const get = (req: Request, res: Response) => {
-    const page = req.query.page;
-    const categoryName = req.query.categoryName;
-    const categoryId = req.query.categoryId;
+    const page: number = req.query.page;
+    const categoryName: string = req.query.categoryName;
+    const categoryId: number = req.query.categoryId;
+    const showDeleted: boolean = (req.query.showDeleted == 'true')
+        || categoryName != undefined
+        || categoryId != undefined;
     const sqlQuery = `
     SELECT category_id,
         \`name\`,
@@ -18,7 +21,7 @@ export const get = (req: Request, res: Response) => {
         \`image\`,
         \`deleted\`
     FROM category
-    WHERE deleted != 1
+    WHERE deleted != ${showDeleted ? 2 : 1}
     ${categoryName != undefined ? `AND name = '${categoryName}'` : ''}
     ${categoryId != undefined ? `AND category_id = '${categoryId}'` : ''}
     ;`;
@@ -34,7 +37,7 @@ export const get = (req: Request, res: Response) => {
                     group: results[i].group,
                     description: results[i].description,
                     image: results[i].image,
-                    deleted: results[i].deleted == 1
+                    deleted: results[i].deleted
                 };
                 categories.push(category);
             }
@@ -91,7 +94,7 @@ export const put = (req: Request, res: Response) => {
         \`group\` = '${category.group}',
         \`description\` = '${category.description}',
         \`image\` = '${category.image}',
-        \`deleted\` = '${category.deleted ? 1 : 0}'
+        \`deleted\` = '${category.deleted}'
     WHERE \`category_id\` = ${category.category_id}
     ;`;
     connection.query(sqlQuery, (error, results, fields) => {
