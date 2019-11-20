@@ -3,41 +3,36 @@ import {Question} from "../models/question";
 import {connection} from '../util/database';
 
 /**
- * GET /questions/
- * GET /questions?categoryName={name}
+ * GET /questions?page=1&deleted=false
+ * GET /questions?page=1&deleted=false&id={id}
+ * GET /questions?page=1&deleted=false&category={name}
  * Retrieve all questions from database
  */
 export const get = (req: Request, res: Response) => {
+    const page = req.query.page;
+    const questionId = req.query.id;
+    const categoryName = req.query.category;
+    const showDeleted = req.query.deleted == 'true'
+        || categoryName != undefined
+        || questionId != undefined;
     let sqlQuery = `
-    SELECT 
-        question_id,
-        question,
-        correct_answer,
-        incorrect_answer_1,
-        incorrect_answer_2,
-        incorrect_answer_3,
-        deleted,
-        category_name
-    FROM question, category
-    WHERE question.deleted != 1
-    `;
-    const categoryName = req.query.categoryName;
-    if (categoryName != undefined) {
-        sqlQuery = `
-        SELECT 
-            question_id,
-            question,
-            correct_answer,
-            incorrect_answer_1,
-            incorrect_answer_2,
-            incorrect_answer_3,
-            deleted,
-            category_name
-        FROM question, category
-        WHERE category.category_name = '${categoryName}'
-        AND question.deleted != 1
-        `;
-    }
+    SELECT \`question_id\`,
+        \`question\`,
+        \`answer\`,
+        \`incorrect_1\`,
+        \`incorrect_2\`,
+        \`incorrect_3\`,
+        question.deleted,
+        question.category_id,
+        (SELECT category.name
+         FROM category
+         WHERE category.category_id = question.category_id)
+         AS category_name
+    FROM question
+    WHERE question.deleted != ${showDeleted ? -1 : 1}
+    ${questionId != undefined ? `AND question_id = ${questionId}` : ''}
+    ${categoryName != undefined ? `AND category.name = ${categoryName}` : ''}
+    ;`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).json(error);
@@ -45,17 +40,25 @@ export const get = (req: Request, res: Response) => {
             const questions: Question[] = [];
             for (let i = 0; i < results.length; i++) {
                 const question: Question = {
-                    id: results[i].question_id,
+                    question_id: results[i].question_id,
                     question: results[i].question,
-                    correctAnswer: results[i].correct_answer,
-                    incorrectAnswer1: results[i].incorrect_answer_1,
-                    incorrectAnswer2: results[i].incorrect_answer_2,
-                    incorrectAnswer3: results[i].incorrect_answer_3,
-                    category: results[i].category_name
+                    answer: results[i].answer,
+                    deleted: results[i].deleted,
+                    incorrect_1: results[i].incorrect_1,
+                    incorrect_2: results[i].incorrect_2,
+                    incorrect_3: results[i].incorrect_3,
+                    category_id: results[i].category_id,
+                    category_name: results[i].category_name
                 };
                 questions.push(question);
             }
-            res.status(200).json(questions);
+            const startIndex = (page - 1) * 10;
+            const endIndex = (page * 10) - 1;
+            res.status(200).send({
+                page: page,
+                total: questions.length,
+                results: questions.splice(startIndex, 10)
+            });
         }
     });
 };
@@ -68,22 +71,22 @@ export const post = (req: Request, res: Response) => {
     const question: Question = req.body;
     const sqlQuery = `
     INSERT INTO question(
-        question,
-        correct_answer,
-        incorrect_answer_1,
-        incorrect_answer_2,
-        incorrect_answer_3,
-        category_id
+        \`question\`,
+        \`answer\`,
+        \`deleted\`,
+        \`incorrect_1\`,
+        \`incorrect_2\`,
+        \`incorrect_3\`,
+        \`category_id\`
     ) VALUES (
         '${question.question}',
-        '${question.correctAnswer}',
-        '${question.incorrectAnswer1}',
-        '${question.incorrectAnswer2}',
-        '${question.incorrectAnswer3}',
-        (SELECT category_id
-         FROM category
-         WHERE category_name = '${question.category}'));
-    `;
+        '${question.answer}',
+        '${question.deleted}',
+        '${question.incorrect_1}',
+        '${question.incorrect_2}',
+        '${question.incorrect_3}',
+        '${question.category_id}'
+    );`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).json(error);
@@ -100,17 +103,16 @@ export const post = (req: Request, res: Response) => {
 export const put = (req: Request, res: Response) => {
     const question: Question = req.body;
     const sqlQuery = `
-        UPDATE question
-        SET question = "${question.question}", 
-        correct_answer = "${question.correctAnswer}", 
-        incorrect_answer_1 = "${question.incorrectAnswer1}", 
-        incorrect_answer_2 = "${question.incorrectAnswer2}", 
-        incorrect_answer_3 = "${question.incorrectAnswer3}", 
-        category_id = (SELECT category_id 
-                       FROM category 
-                       WHERE category_name = "${question.category}")
-        WHERE question_id = ${question.id};
-    `;
+    UPDATE question
+    SET question = "${question.question}", 
+        \`answer\` = "${question.answer}", 
+        \`deleted\` = "${question.deleted}",
+        \`incorrect_1\` = "${question.incorrect_1}", 
+        \`incorrect_2\` = "${question.incorrect_2}", 
+        \`incorrect_3\` = "${question.incorrect_3}", 
+        \`category_id\` = "${question.category_id}"
+    WHERE \`question_id\` = ${question.question_id}
+    ;`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).json(error);
@@ -121,11 +123,11 @@ export const put = (req: Request, res: Response) => {
 };
 
 /**
- * DELETE /questions/
+ * DELETE /questions?questionId=3
  * Mark a question record as deleted in database with the following id
  */
 export const remove = (req: Request, res: Response) => {
-    const questionId = req.query.questionId;
+    const questionId = req.query.id;
     const sqlQuery = `
     UPDATE question
     SET deleted = 1
