@@ -3,43 +3,28 @@ import {Answer} from '../models/answer';
 import {connection} from '../util/database';
 
 /**
- * GET /answers/
- * GET /answers?userId={id}
- * GET /answers?correct=true
+ * GET /answers?page={1}&deleted={0}&correct={0}
+ * GET /answers?page={1}&deleted={0}&correct={0}&userId={123}
  */
 export const get = (req: Request, res: Response) => {
-    const userId = req.query.userId;
-    const correct = req.query.correct != undefined;
+    const page: number = req.query.page;
+    const deleted: number = req.query.deleted;
+    const correct: number = req.query.correct;
+    const userId: number = req.query.userId;
     let sqlQuery = `
-    SELECT answer_id,
-        ip_address,
-        correct,
-        answer,
-        deleted,
-        datetime,
-        question_id,
-        user_id
+    SELECT \`answer_id\`,
+        \`answer\`,
+        \`correct\`,
+        \`deleted\`,
+        \`ip\`,
+        \`date_answered\`,
+        \`question_id\`,
+        \`user_id\`
     FROM answer
-    WHERE deleted = 0
-    ${correct ? 'AND correct = 1' : ''};
-  `;
-    if (userId != undefined) {
-        sqlQuery = `
-        SELECT
-            answer_id,
-            ip_address,
-            correct,
-            answer,
-            deleted,
-            datetime,
-            question_id,
-            user_id
-        FROM answer
-        WHERE deleted = 0
-        AND user_id = ${userId}
-        ${correct ? 'AND correct = 1' : ''};
-        `;
-    }
+    WHERE \`deleted\` != ${deleted == 0 ? 2 : 1}
+    ${correct == 1 ? 'AND \`correct\` = 1' : ''}
+    ${userId != undefined ? `AND \`user_id\` = ${userId}` : ''}
+  ;`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).send(error);
@@ -48,17 +33,23 @@ export const get = (req: Request, res: Response) => {
             for (let i = 0; i < results.length; i++) {
                 const answer: Answer = {
                     answer_id: results[i].answer_id,
-                    ip_address: results[i].ip_address,
-                    correct: results[i].correct === 1,
                     answer: results[i].answer,
-                    deleted: results[i].deleted === 1,
-                    datetime: results[i].datetime,
+                    correct: results[i].correct,
+                    deleted: results[i].deleted,
+                    ip: results[i].ip,
+                    date_answered: results[i].date_answered,
                     question_id: results[i].question_id,
                     user_id: results[i].user_id
                 };
                 answers.push(answer);
             }
-            res.status(200).send(answers);
+            const startIndex = (page - 1) * 10;
+            const endIndex = (page * 10) - 1;
+            res.status(200).send({
+                page: page,
+                total: answers.length,
+                results: answers.splice(startIndex, 10)
+            });
         }
     });
 };
@@ -71,19 +62,19 @@ export const post = (req: Request, res: Response) => {
     const answer: Answer = req.body;
     const sqlQuery = `
     INSERT INTO answer(
-        ip_address,
-        correct,
-        answer,
-        deleted,
-        datetime,
-        question_id,
-        user_id
+        \`ip\`,
+        \`correct\`,
+        \`answer\`,
+        \`deleted\`,
+        \`date_answered\`,
+        \`question_id\`,
+        \`user_id\`
     ) VALUES (
-        '${answer.ip_address}',
-        ${answer.correct ? 1 : 0},
+        '${answer.ip}',
+        ${answer.correct},
         '${answer.answer}',
-        ${answer.deleted ? 1 : 0},
-        '${answer.datetime}',
+        ${answer.deleted},
+        '${answer.date_answered}',
         ${answer.question_id},
         ${answer.user_id}
     );
@@ -106,11 +97,11 @@ export const put = (req: Request, res: Response) => {
     console.log(answer);
     const sqlQuery = `
     UPDATE answer
-    SET ip_address = '${answer.ip_address}',
+    SET ip_address = '${answer.ip}',
         correct = ${answer.correct ? 1 : 0},
         answer = '${answer.answer}',
         deleted = ${answer.deleted ? 1 : 0},
-        datetime = '${answer.datetime}',
+        datetime = '${answer.date_answered}',
         question_id = ${answer.question_id},
         user_id = ${answer.user_id}
     WHERE answer_id = ${answer.answer_id};
