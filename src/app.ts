@@ -1,16 +1,15 @@
 import express from "express";
 import compression from "compression";
 import bodyParser from "body-parser";
-import cors, { CorsOptions } from "cors";
+import cors, {CorsOptions} from "cors";
 
-import { PORT, API_KEY } from "./util/secrets";
-
+import {PORT} from "./util/secrets";
 // Controllers (route handlers)
-import * as homeController from "./controllers/home";
-import * as questionController from "./controllers/question";
+import * as questionController from "./controllers/questions";
 import * as answerController from "./controllers/answers";
 import * as categoryController from "./controllers/categories";
 import * as userController from "./controllers/users";
+import * as quizController from "./controllers/quiz";
 
 // Create Express server
 const app = express();
@@ -60,6 +59,6 @@ app.get('/users', userController.get);
 app.post('/users', userController.post);
 app.put('/users', userController.put);
 
-
+app.get('/quiz', quizController.get);
 
 export default app;
