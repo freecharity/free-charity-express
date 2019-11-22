@@ -63,7 +63,9 @@ app.put('/users', userController.put);
 app.get('/quiz', quizController.get);
 
 app.post('/auth/login', authenticationController.loginUser);
-app.post('/auth/validate', authenticationController.validateUser);
 app.post('/auth/logout', authenticationController.logoutUser);
+app.post('/auth/validate', authenticationController.validateUser);
+app.post('/auth/register', authenticationController.registerUser);
+
 
 export default app;
