@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {Request, Response} from 'express';
 import {User} from '../models/user';
 import {connection} from '../util/database';
 
@@ -20,15 +20,15 @@ export const get = (req: Request, res: Response) => {
     }
     const sqlQuery = `
     SELECT user_id,
-        username,
-        email,
-        password,
-        avatar,
-        date_registered
+        \`username\`,
+        \`email\`,
+        \`password\`,
+        \`avatar\`,
+        \`deleted\`,
+        \`date_registered\`
     FROM user
     ${identifier[0] != undefined ? `WHERE ${identifier[0]} = '${identifier[1]}'` : ''}
-    ;
-  `;
+    ;`;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).send(error);
@@ -40,6 +40,7 @@ export const get = (req: Request, res: Response) => {
                     username: results[i].username,
                     email: results[i].email,
                     password: results[i].password,
+                    deleted: results[i].deleted,
                     avatar: results[i].avatar,
                     date_registered: results[i].date_registered
                 };

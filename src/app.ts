@@ -1,15 +1,16 @@
-import express from "express";
-import compression from "compression";
-import bodyParser from "body-parser";
-import cors, {CorsOptions} from "cors";
+import express from 'express';
+import compression from 'compression';
+import bodyParser from 'body-parser';
+import cors, {CorsOptions} from 'cors';
 
-import {PORT} from "./util/secrets";
+import {PORT} from './util/secrets';
 // Controllers (route handlers)
-import * as questionController from "./controllers/questions";
-import * as answerController from "./controllers/answers";
-import * as categoryController from "./controllers/categories";
-import * as userController from "./controllers/users";
-import * as quizController from "./controllers/quiz";
+import * as questionController from './controllers/questions';
+import * as answerController from './controllers/answers';
+import * as categoryController from './controllers/categories';
+import * as userController from './controllers/users';
+import * as quizController from './controllers/quiz';
+import * as authenticationController from './controllers/authentication';
 
 // Create Express server
 const app = express();
@@ -60,5 +61,9 @@ app.post('/users', userController.post);
 app.put('/users', userController.put);
 
 app.get('/quiz', quizController.get);
+
+app.post('/auth/login', authenticationController.loginUser);
+app.post('/auth/validate', authenticationController.validateUser);
+app.post('/auth/logout', authenticationController.logoutUser);
 
 export default app;
