@@ -57,6 +57,7 @@ app.put("/categories", categoryController.put);
 app.delete("/categories", categoryController.remove);
 
 app.get('/users', userController.get);
+app.get('/users/count', userController.getCount);
 app.post('/users', userController.post);
 app.put('/users', userController.put);
 

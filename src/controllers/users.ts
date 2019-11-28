@@ -12,7 +12,7 @@ export const get = (req: Request, res: Response) => {
     const email = req.query.email;
     let identifier: any = [undefined, undefined];
     if (userId != undefined) {
-        identifier = ['user_id', userId]
+        identifier = ['user_id', userId];
     } else if (username != undefined) {
         identifier = ['username', username];
     } else if (email != undefined) {
@@ -47,6 +47,26 @@ export const get = (req: Request, res: Response) => {
                 users.push(user);
             }
             res.status(200).send(users);
+        }
+    });
+};
+
+/**
+ * GET /users/count
+ * Return the number of users in the database
+ */
+export const getCount = (req: Request, res: Response) => {
+    const sqlQuery = `
+    SELECT COUNT(user.user_id) as user_count
+    FROM user;
+    `;
+
+    connection.query(sqlQuery, (error, results, fields) => {
+        if (error) {
+            res.status(400).send(error);
+        } else {
+            const count = results[0].user_count;
+            res.status(200).send({count});
         }
     });
 };
@@ -96,11 +116,11 @@ export const put = (req: Request, res: Response) => {
     WHERE user_id = ${user.user_id};
     `;
     connection.query(sqlQuery, (error, results, fields) => {
-       if (error) {
-           res.status(400).send(error);
-       } else {
-           res.status(200).send(results);
-       }
+        if (error) {
+            res.status(400).send(error);
+        } else {
+            res.status(200).send(results);
+        }
     });
 };
 
