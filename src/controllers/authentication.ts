@@ -131,7 +131,6 @@ const registerCredentials = async (user: User): Promise<User> => {
             if (error) {
                 reject(error);
             } else {
-                const user: User = results[0];
                 resolve(user);
             }
         });

@@ -9,13 +9,13 @@ import {User} from '../models/user';
 export class UserSession {
     public sessions: Map<string, string> = new Map<string, string>();
 
-    public addUserSession(user: User) {
+    public addUserSession(user: User): string {
         const sessionId = this.generateSessionId();
         this.sessions.set(user.username.toLowerCase(), sessionId);
         return sessionId;
     }
 
-    public removeUserSession(user: User) {
+    public removeUserSession(user: User): boolean {
         this.sessions.delete(user.username.toLowerCase());
         return !this.sessions.has(user.username.toLowerCase());
     }
