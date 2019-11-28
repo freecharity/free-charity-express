@@ -1,30 +1,33 @@
-import {Request, Response} from "express";
+import {Request, Response} from 'express';
 import {Answer} from '../models/answer';
 import {connection} from '../util/database';
 
 /**
  * GET /answers?page={1}&deleted={0}&correct={0}
- * GET /answers?page={1}&deleted={0}&correct={0}&userId={123}
+ * GET /answers?page={1}&deleted={0}&correct={0}&username={'jason'}
  */
 export const get = (req: Request, res: Response) => {
     const page: number = req.query.page;
     const deleted: number = req.query.deleted;
     const correct: number = req.query.correct;
-    const userId: number = req.query.userId;
-    let sqlQuery = `
-    SELECT \`answer_id\`,
-        \`answer\`,
-        \`correct\`,
-        \`deleted\`,
-        \`ip\`,
-        \`date_answered\`,
-        \`question_id\`,
-        \`user_id\`
+    const username: string = req.query.username;
+    const sqlQuery = `
+    SELECT answer.answer_id,
+        answer.answer,
+        answer.correct,
+        answer.deleted,
+        answer.ip,
+        answer.date_answered,
+        answer.question_id,
+        answer.user_id
     FROM answer
-    WHERE \`deleted\` != ${deleted == 0 ? 2 : 1}
-    ${correct == 1 ? 'AND \`correct\` = 1' : ''}
-    ${userId != undefined ? `AND \`user_id\` = ${userId}` : ''}
-  ;`;
+    WHERE answer.deleted != ${deleted == 0 ? 2 : 1}
+    ${correct === 1 ? 'AND answer.correct = 1' : ''}
+    ${username != undefined ?
+        `AND user_id = (SELECT user.user_id
+                  FROM user
+                  WHERE username = '${username}');` : ''}
+    `;
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).send(error);
@@ -60,32 +63,55 @@ export const get = (req: Request, res: Response) => {
  */
 export const post = (req: Request, res: Response) => {
     const answer: Answer = req.body;
+    // const sqlQuery = `
+    // INSERT INTO answer(
+    //     \`ip\`,
+    //     \`correct\`,
+    //     \`answer\`,
+    //     \`deleted\`,
+    //     \`date_answered\`,
+    //     \`question_id\`,
+    //     \`user_id\`
+    // ) VALUES (
+    //     '${answer.ip}',
+    //     ${answer.correct},
+    //     '${answer.answer}',
+    //     ${answer.deleted},
+    //     '${answer.date_answered}',
+    //     ${answer.question_id},
+    //     (SELECT user.user_id
+    //     FROM user
+    //     WHERE user.username = ${answer.username})
+    // );
+    // `;
     const sqlQuery = `
     INSERT INTO answer(
-        \`ip\`,
-        \`correct\`,
-        \`answer\`,
-        \`deleted\`,
-        \`date_answered\`,
-        \`question_id\`,
-        \`user_id\`
-    ) VALUES (
+        answer.ip,
+        answer.correct,
+        answer.answer,
+        answer.deleted,
+        answer.date_answered,
+        answer.question_id,
+        answer.user_id
+        ) VALUES (
         '${answer.ip}',
         ${answer.correct},
         '${answer.answer}',
         ${answer.deleted},
         '${answer.date_answered}',
         ${answer.question_id},
-        ${answer.user_id}
-    );
+        (SELECT user.user_id
+        FROM user
+        WHERE user.username = '${answer.username}'));
     `;
+
     connection.query(sqlQuery, (error, results, fields) => {
         if (error) {
             res.status(400).send(error);
         } else {
             res.status(200).send(results);
         }
-    })
+    });
 };
 
 /**
@@ -112,7 +138,7 @@ export const put = (req: Request, res: Response) => {
         } else {
             res.status(200).send(results);
         }
-    })
+    });
 };
 
 /**

@@ -7,4 +7,5 @@ export interface Answer {
     date_answered: string;
     question_id: number;
     user_id: number;
+    username?: string;
 }
