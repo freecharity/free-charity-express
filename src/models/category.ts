@@ -4,5 +4,4 @@ export interface Category {
     group: string;
     description: string;
     image: string;
-    deleted: boolean;
 }

@@ -1,6 +1,6 @@
-import {Request, Response} from "express";
+import {Request, Response} from 'express';
 import {Category} from '../models/category';
-import {connection} from '../util/database';
+import {deleteCategory, postCategory, selectCategories, updateCategory} from '../database/categories';
 
 /**
  * GET /categories/
@@ -10,46 +10,13 @@ export const get = (req: Request, res: Response) => {
     const page: number = req.query.page;
     const categoryName: string = req.query.categoryName;
     const categoryId: number = req.query.categoryId;
-    const showDeleted: boolean = (req.query.showDeleted == 'true')
+    const deleted: boolean = (req.query.showDeleted == 'true')
         || categoryName != undefined
         || categoryId != undefined;
-    const sqlQuery = `
-    SELECT category_id,
-        \`name\`,
-        \`group\`,
-        \`description\`,
-        \`image\`,
-        \`deleted\`
-    FROM category
-    WHERE deleted != ${showDeleted ? 2 : 1}
-    ${categoryName != undefined ? `AND name = '${categoryName}'` : ''}
-    ${categoryId != undefined ? `AND category_id = '${categoryId}'` : ''}
-    ;`;
-    connection.query(sqlQuery, (error, results, fields) => {
-        if (error) {
-            res.status(400).send(error);
-        } else {
-            const categories: Category[] = [];
-            for (let i = 0; i < results.length; i++) {
-                const category: Category = {
-                    category_id: results[i].category_id,
-                    name: results[i].name,
-                    group: results[i].group,
-                    description: results[i].description,
-                    image: results[i].image,
-                    deleted: results[i].deleted
-                };
-                categories.push(category);
-            }
-
-            const startIndex = (page-1) * 10;
-            const endIndex = (page*10) - 1;
-            res.status(200).send({
-                page: page,
-                total: categories.length,
-                results: categories.splice(startIndex, 10)
-            });
-        }
+    selectCategories(page, deleted, categoryName, categoryId).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
     });
 };
 
@@ -59,26 +26,10 @@ export const get = (req: Request, res: Response) => {
  */
 export const post = (req: Request, res: Response) => {
     const category: Category = req.body;
-    const sqlQuery = `
-    INSERT INTO category(
-        \`name\`,
-        \`group\`,
-        \`description\`,
-        \`image\`,
-        \`deleted\`
-    ) VALUES (
-        '${category.name}',
-        '${category.group}',
-        '${category.description}',
-        '${category.image}',
-        '${category.deleted}'
-    );`;
-    connection.query(sqlQuery, (error, results, fields) => {
-        if (error) {
-            res.status(400).send(error);
-        } else {
-            res.status(200).send(results);
-        }
+    postCategory(category).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
     });
 };
 
@@ -88,40 +39,22 @@ export const post = (req: Request, res: Response) => {
  */
 export const put = (req: Request, res: Response) => {
     const category: Category = req.body;
-    const sqlQuery = `
-    UPDATE category
-    SET \`name\` = '${category.name}',
-        \`group\` = '${category.group}',
-        \`description\` = '${category.description}',
-        \`image\` = '${category.image}',
-        \`deleted\` = '${category.deleted}'
-    WHERE \`category_id\` = ${category.category_id}
-    ;`;
-    connection.query(sqlQuery, (error, results, fields) => {
-        if (error) {
-            res.status(400).json(error);
-        } else {
-            res.status(200).json(results);
-        }
+    updateCategory(category).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
     });
 };
 
 /**
- * DELETE /categories/
+ * DELETE /categories?id={id}
  * Delete a category record with the following id
  */
 export const remove = (req: Request, res: Response) => {
-    const categoryId = req.query.categoryId;
-    const sqlQuery = `
-    UPDATE category
-    SET \`deleted\` = 1
-    WHERE \`category_id\` = ${categoryId}
-    ;`;
-    connection.query(sqlQuery, (error, results, fields) => {
-        if (error) {
-            res.status(400).json(error);
-        } else {
-            res.status(200).json(results);
-        }
+    const categoryId = req.query.id;
+    deleteCategory(categoryId).then((response) => {
+        res.status(200).send(response);
+    }).catch((error) => {
+        res.status(400).send(error);
     });
 };
