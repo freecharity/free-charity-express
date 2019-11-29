@@ -4,11 +4,6 @@ import {Question} from '../models/question';
 
 const request = supertest(app);
 
-/**
- * This file tests the /questions endpoint and the database behind it. It will go through a procedure of inserting
- * a question record into the database, querying it, updating it and finally removing it.
- */
-
 const question: Question = {
     question_id: -1,
     question: 'test_question',
@@ -69,8 +64,10 @@ it('Fails to get a question with a non-existing id', async done => {
 
 it('Updates a question', async done => {
     // SEND PUT Request to /questions
+    question.question = 'test_updated_question';
     const response: Response = await request.put('/questions').send(question);
     expect(response.status).toBe(200);
+    expect(response.body.affectedRows).toBe(1);
     done();
 });
 

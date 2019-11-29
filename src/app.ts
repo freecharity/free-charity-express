@@ -17,9 +17,9 @@ const app = express();
 
 // Domain Whitelist
 const whitelist = [
-    "http://jefthimi.net/",
-    "http://www.jefthimi.net/",
-    "http://localhost:8080"
+    'http://jefthimi.net/',
+    'http://www.jefthimi.net/',
+    'http://localhost:8080'
 ];
 const corsOptions: CorsOptions = {
     origin: (origin, callback) => {
@@ -32,30 +32,31 @@ const corsOptions: CorsOptions = {
 };
 
 // Express configuration
-app.set("port", PORT);
+app.set('port', PORT);
 app.use(compression());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors(corsOptions));
 
 /**
  * Server routes.
  */
-app.get("/questions", questionController.get);
-app.post("/questions", questionController.post);
-app.put("/questions", questionController.put);
+app.get('/questions', questionController.get);
+app.post('/questions', questionController.post);
+app.put('/questions', questionController.put);
 app.delete('/questions', questionController.remove);
 app.delete('/questions/delete', questionController.deleteForce);
 
-app.get("/answers", answerController.get);
-app.post("/answers", answerController.post);
-app.put("/answers", answerController.put);
-app.delete("/answers", answerController.remove);
+app.get('/answers', answerController.get);
+app.post('/answers', answerController.post);
+app.put('/answers', answerController.put);
+// app.delete("/answers", answerController.remove);
+app.delete('/answers', answerController.deleteForce);
 
-app.get("/categories", categoryController.get);
-app.post("/categories", categoryController.post);
-app.put("/categories", categoryController.put);
-app.delete("/categories", categoryController.remove);
+app.get('/categories', categoryController.get);
+app.post('/categories', categoryController.post);
+app.put('/categories', categoryController.put);
+app.delete('/categories', categoryController.remove);
 
 app.get('/users', userController.get);
 app.get('/users/count', userController.getCount);

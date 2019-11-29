@@ -1,7 +1,7 @@
 import {Question} from '../models/question';
 import {connection} from '../util/database';
 
-export const select = (page: number, deleted: boolean, questionId?: number, category?: string): Promise<any> => {
+export const selectQuestion = (page: number, deleted: boolean, questionId?: number, category?: string): Promise<any> => {
     return new Promise((resolve, reject) => {
         let statement = `
         SELECT question.question_id,
@@ -53,7 +53,7 @@ export const select = (page: number, deleted: boolean, questionId?: number, cate
     });
 };
 
-export const insert = (question: Question): Promise<any> => {
+export const insertQuestion = (question: Question): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `
         INSERT INTO question(
@@ -83,7 +83,7 @@ export const insert = (question: Question): Promise<any> => {
     });
 };
 
-export const update = (question: Question): Promise<any> => {
+export const updateQuestion = (question: Question): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `
         UPDATE question
@@ -106,7 +106,7 @@ export const update = (question: Question): Promise<any> => {
     });
 };
 
-export const markDeleted = (questionId: number): Promise<any> => {
+export const updateQuestionDeleted = (questionId: number): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `
         UPDATE question

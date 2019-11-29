@@ -1,6 +1,12 @@
 import {Request, Response} from 'express';
 import {Question} from '../models/question';
-import {deleteQuestion, insert, markDeleted, select, update} from '../database/questions';
+import {
+    deleteQuestion,
+    insertQuestion,
+    selectQuestion,
+    updateQuestion,
+    updateQuestionDeleted
+} from '../database/questions';
 
 /**
  * GET /questions?page=1&deleted={false}
@@ -13,7 +19,7 @@ export const get = (req: Request, res: Response) => {
     const questionId: number = req.query.id;
     const category: string = req.query.category;
     const deleted: boolean = req.query.deleted == 'true' || category != undefined || questionId != undefined;
-    select(page, deleted, questionId, category).then((success) => {
+    selectQuestion(page, deleted, questionId, category).then((success) => {
         res.status(200).json(success);
     }).catch((error) => {
         res.status(400).json(error);
@@ -26,7 +32,7 @@ export const get = (req: Request, res: Response) => {
  */
 export const post = (req: Request, res: Response) => {
     const question: Question = req.body;
-    insert(question).then((success) => {
+    insertQuestion(question).then((success) => {
         res.status(200).json(success);
     }).catch((error) => {
         res.status(400).json(error);
@@ -39,7 +45,7 @@ export const post = (req: Request, res: Response) => {
  */
 export const put = (req: Request, res: Response) => {
     const question: Question = req.body;
-    update(question).then((success) => {
+    updateQuestion(question).then((success) => {
         res.status(200).json(success);
     }).catch((error) => {
         res.status(400).json(error);
@@ -52,7 +58,7 @@ export const put = (req: Request, res: Response) => {
  */
 export const remove = (req: Request, res: Response) => {
     const questionId = req.query.id;
-    markDeleted(questionId).then((success) => {
+    updateQuestionDeleted(questionId).then((success) => {
         res.status(200).json(success);
     }).catch((error) => {
         res.status(400).json(error);
