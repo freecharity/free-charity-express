@@ -2,9 +2,19 @@ import app from '../app';
 import supertest, {Response} from 'supertest';
 import {Question} from '../models/question';
 import {Answer} from '../models/answer';
+import {Category} from '../models/category';
 import {deleteQuestion, insertQuestion} from '../database/questions';
+import {deleteCategory, insertCategory} from '../database/categories';
 
 const request = supertest(app);
+
+const category: Category = {
+    category_id: -1,
+    name: 'test_answer_category',
+    group: 'test_category_group',
+    description: 'this category is for testing the answers endpoint',
+    image: '1'
+};
 
 const question: Question = {
     question_id: -1,
@@ -14,8 +24,8 @@ const question: Question = {
     incorrect_2: 'test_incorrect_2',
     incorrect_3: 'test_incorrect_3',
     deleted: 0,
-    category_name: '', // TODO: Mock Category Name
-    category_id: 1 // TODO: Mock Category Id
+    category_name: '',
+    category_id: -1
 };
 
 const answer: Answer = {
@@ -31,14 +41,21 @@ const answer: Answer = {
 };
 
 beforeAll(async () => {
-    await insertQuestion(question).then((response) => {
-        question.question_id = response.insertId;
-        answer.question_id = response.insertId;
+    await insertCategory(category).then(async (response) => {
+        category.category_id = response.insertId;
+        question.category_id = category.category_id;
+        question.category_name = category.name;
+        await insertQuestion(question).then((response) => {
+            question.question_id = response.insertId;
+            answer.question_id = question.question_id;
+        });
     });
+
 });
 
 afterAll(async () => {
     await deleteQuestion(question.question_id);
+    await deleteCategory(category.category_id);
 });
 
 it('Posts an answer', async done => {
@@ -51,18 +68,21 @@ it('Posts an answer', async done => {
 it('Selects answers', async done => {
     const response: Response = await request.get('/answers?page=1&deleted=0&correct=0');
     expect(response.status).toBe(200);
+    expect(response.body.page).toBe(1);
     expect(response.body.results.length).toBeGreaterThan(0);
     done();
 });
 
 it('Selects answers that are deleted', async done => {
     const response: Response = await request.get('/answers?page=1&deleted=1&correct=0');
+    expect(response.body.page).toBe(1);
     expect(response.status).toBe(200);
     done();
 });
 
 it('Selects answers that are correct', async done => {
     const response: Response = await request.get('/answers?page=1&deleted=0&correct=1');
+    expect(response.body.page).toBe(1);
     expect(response.status).toBe(200);
     done();
 });
@@ -78,5 +98,6 @@ it('Updates an answer', async done => {
 it('Deletes an answer', async done => {
     const response: Response = await request.delete(`/answers?answerId=${answer.answer_id}`);
     expect(response.status).toBe(200);
+    expect(response.body.affectedRows).toBe(1);
     done();
 });

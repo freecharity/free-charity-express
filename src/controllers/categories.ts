@@ -1,15 +1,15 @@
 import {Request, Response} from 'express';
 import {Category} from '../models/category';
-import {deleteCategory, postCategory, selectCategories, updateCategory} from '../database/categories';
+import {deleteCategory, insertCategory, selectCategories, updateCategory} from '../database/categories';
 
 /**
  * GET /categories/
  * Retrieve all categories from database
  */
 export const get = (req: Request, res: Response) => {
-    const page: number = req.query.page;
+    const page: number = req.query.page != undefined ? parseInt(req.query.page) : undefined;
+    const categoryId: number = req.query.categoryId != undefined ? parseInt(req.query.categoryId) : undefined;
     const categoryName: string = req.query.categoryName;
-    const categoryId: number = req.query.categoryId;
     const deleted: boolean = (req.query.showDeleted == 'true')
         || categoryName != undefined
         || categoryId != undefined;
@@ -26,7 +26,7 @@ export const get = (req: Request, res: Response) => {
  */
 export const post = (req: Request, res: Response) => {
     const category: Category = req.body;
-    postCategory(category).then((response) => {
+    insertCategory(category).then((response) => {
         res.status(200).json(response);
     }).catch((error) => {
         res.status(400).json(error);

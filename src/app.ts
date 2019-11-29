@@ -62,6 +62,7 @@ app.get('/users', userController.get);
 app.get('/users/count', userController.getCount);
 app.post('/users', userController.post);
 app.put('/users', userController.put);
+app.delete('/users', userController.remove);
 
 app.get('/quiz', quizController.get);
 

@@ -20,29 +20,14 @@ export const selectQuestion = (page: number, deleted: boolean, questionId?: numb
         WHERE question.category_id = category.category_id
         AND question.deleted != ${deleted ? -1 : 1}
         ${questionId != undefined ? `AND question_id = ${questionId}` : ''}
-        ${category != undefined ? `AND category.name = '${category}'` : ''}
-        ;`;
+        ${category != undefined ? `AND category.name = '${category}'` : ''};
+        `;
         connection.query(statement, (error, results) => {
             if (error) {
                 reject(error);
             } else {
-                const questions: Question[] = [];
-                for (let i = 0; i < results.length; i++) {
-                    const question: Question = {
-                        question_id: results[i].question_id,
-                        question: results[i].question,
-                        answer: results[i].answer,
-                        deleted: results[i].deleted,
-                        incorrect_1: results[i].incorrect_1,
-                        incorrect_2: results[i].incorrect_2,
-                        incorrect_3: results[i].incorrect_3,
-                        category_id: results[i].category_id,
-                        category_name: results[i].category_name
-                    };
-                    questions.push(question);
-                }
                 const startIndex = (page - 1) * 10;
-                const endIndex = (page * 10) - 1;
+                const questions: Question[] = parseQuestionsFromResults(results);
                 resolve({
                     page: page,
                     total: questions.length,
@@ -138,4 +123,23 @@ export const deleteQuestion = (questionId: number): Promise<any> => {
             }
         });
     });
+};
+
+const parseQuestionsFromResults = (results: any) => {
+    const questions: Question[] = [];
+    for (let i = 0; i < results.length; i++) {
+        const question: Question = {
+            question_id: results[i].question_id,
+            question: results[i].question,
+            answer: results[i].answer,
+            deleted: results[i].deleted,
+            incorrect_1: results[i].incorrect_1,
+            incorrect_2: results[i].incorrect_2,
+            incorrect_3: results[i].incorrect_3,
+            category_id: results[i].category_id,
+            category_name: results[i].category_name
+        };
+        questions.push(question);
+    }
+    return questions;
 };

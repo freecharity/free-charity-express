@@ -1,55 +1,21 @@
 import {Request, Response} from 'express';
 import {User} from '../models/user';
 import {connection} from '../util/database';
+import {deleteUser, insertUser, selectUser, updateUser} from '../database/users';
 
 /**
  * GET /users/
  * Retrieve all users from database
  */
 export const get = (req: Request, res: Response) => {
-    const userId = req.query.userId;
-    const username = req.query.username;
-    const email = req.query.email;
-    let identifier: any = [undefined, undefined];
-    if (userId != undefined) {
-        identifier = ['user_id', userId];
-    } else if (username != undefined) {
-        identifier = ['username', username];
-    } else if (email != undefined) {
-        identifier = ['email', email];
-    }
-    const sqlQuery = `
-    SELECT 
-        user.user_id,
-        user.username,
-        user.email,
-        user.password,
-        user.avatar,
-        user.deleted,
-        user.date_registered
-    FROM user
-    ${identifier[0] != undefined ? `WHERE ${identifier[0]} = '${identifier[1]}'` : ''}
-    ;`;
-    connection.query(sqlQuery, (error, results) => {
-        if (error) {
-            res.status(400).send(error);
-        } else {
-            const users: User[] = [];
-            for (let i = 0; i < results.length; i++) {
-                const user: User = {
-                    user_id: results[i].user_id,
-                    username: results[i].username,
-                    email: results[i].email,
-                    password: results[i].password,
-                    deleted: results[i].deleted,
-                    avatar: results[i].avatar,
-                    administrator: results[i].administrator,
-                    date_registered: results[i].date_registered
-                };
-                users.push(user);
-            }
-            res.status(200).send(users);
-        }
+    const page: number = req.query.page != undefined ? parseInt(req.query.page) : undefined;
+    const id: number = req.query.id != undefined ? parseInt(req.query.page) : undefined;
+    const username: string = req.query.username;
+    const email: string = req.query.email;
+    selectUser(page, id, username, email).then((response) => {
+        res.status(200).send(response);
+    }).catch((error) => {
+        res.status(400).send(error);
     });
 };
 
@@ -79,26 +45,10 @@ export const getCount = (req: Request, res: Response) => {
  */
 export const post = (req: Request, res: Response) => {
     const user: User = req.body;
-    const sqlQuery = `
-    INSERT INTO user(
-        username,
-        email,
-        password,
-        avatar,
-        date_registered
-    ) VALUES (
-        '${user.username}',
-        '${user.email}',
-        '${user.password}',
-        '${user.avatar}',
-        '${user.date_registered}'
-    );`;
-    connection.query(sqlQuery, (error, results, fields) => {
-        if (error) {
-            res.status(400).send(error);
-        } else {
-            res.status(200).send(results);
-        }
+    insertUser(user).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
     });
 };
 
@@ -108,21 +58,10 @@ export const post = (req: Request, res: Response) => {
  */
 export const put = (req: Request, res: Response) => {
     const user: User = req.body;
-    const sqlQuery = `
-    UPDATE user
-    SET username = '${user.username}',
-        email = '${user.email}',
-        password = '${user.password}',
-        avatar = '${user.avatar}',
-        date_registered = '${user.date_registered}'
-    WHERE user_id = ${user.user_id};
-    `;
-    connection.query(sqlQuery, (error, results, fields) => {
-        if (error) {
-            res.status(400).send(error);
-        } else {
-            res.status(200).send(results);
-        }
+    updateUser(user).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
     });
 };
 
@@ -130,4 +69,11 @@ export const put = (req: Request, res: Response) => {
  * DELETE /users/
  * Delete a user record in database with the following id
  */
-//TODO add delete users method
+export const remove = (req: Request, res: Response) => {
+    const id: number = req.query.id;
+    deleteUser(id).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
+    });
+};

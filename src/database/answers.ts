@@ -19,7 +19,7 @@ export const selectAnswer = (page: number, deleted: number, correct: number, use
              FROM user
              WHERE username = '${username}');` : ''}
         `;
-        connection.query(sqlQuery, (error, results, fields) => {
+        connection.query(sqlQuery, (error, results) => {
             if (error) {
                 reject(error);
             } else {

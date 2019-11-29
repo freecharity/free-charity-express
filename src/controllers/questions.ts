@@ -15,11 +15,11 @@ import {
  * Retrieve all questions from database
  */
 export const get = (req: Request, res: Response) => {
-    const page: number = req.query.page;
-    const questionId: number = req.query.id;
-    const category: string = req.query.category;
-    const deleted: boolean = req.query.deleted == 'true' || category != undefined || questionId != undefined;
-    selectQuestion(page, deleted, questionId, category).then((success) => {
+    const page: number = req.query.page != undefined ? parseInt(req.query.page) : undefined;
+    const questionId: number = req.query.id != undefined ? parseInt(req.query.id) : undefined;
+    const categoryName: string = req.query.category;
+    const deleted: boolean = req.query.deleted == 'true' || categoryName != undefined || questionId != undefined;
+    selectQuestion(page, deleted, questionId, categoryName).then((success) => {
         res.status(200).json(success);
     }).catch((error) => {
         res.status(400).json(error);

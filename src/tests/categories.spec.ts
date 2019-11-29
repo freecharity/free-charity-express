@@ -8,7 +8,7 @@ const category: Category = {
     category_id: -1,
     name: 'test_category',
     group: 'test_category_group',
-    description: 'this category is for testing purposes',
+    description: 'this category is for testing the categories endpoint',
     image: '1'
 };
 
@@ -24,13 +24,14 @@ it('Gets categories', async done => {
     // Sends GET Request to /categories?page=1&deleted=false
     const response: Response = await request.get('/categories?page=1&deleted=false');
     expect(response.status).toBe(200);
+    expect(response.body.page).toBe(1);
     expect(response.body.results.length).toBeGreaterThan(0);
     done();
 });
 
 it('Updates a category', async done => {
     // Sends PUT Request to /categories
-    category.name = 'test_category_updated';
+    category.name += '_updated';
     const response: Response = await request.put('/categories').send(category);
     expect(response.status).toBe(200);
     expect(response.body.affectedRows).toBe(1);
@@ -41,5 +42,6 @@ it('Deletes a category', async done => {
     // Sends DELETE Request to /categories?id=${category.category_id}
     const response: Response = await request.delete(`/categories?id=${category.category_id}`);
     expect(response.status).toBe(200);
+    expect(response.body.affectedRows).toBe(1);
     done();
 });

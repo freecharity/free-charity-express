@@ -30,7 +30,7 @@ export const selectCategories = (page: number, deleted: boolean, category: strin
     });
 };
 
-export const postCategory = (category: Category): Promise<any> => {
+export const insertCategory = (category: Category): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `
         INSERT INTO category(

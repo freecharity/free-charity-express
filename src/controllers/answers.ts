@@ -8,9 +8,9 @@ import {deleteAnswer, insertAnswer, selectAnswer, updateAnswer} from '../databas
  * GET /answers?page={1}&deleted={0}&correct={0}&username={'jason'}
  */
 export const get = (req: Request, res: Response) => {
-    const page: number = req.query.page;
-    const deleted: number = req.query.deleted;
-    const correct: number = req.query.correct;
+    const page: number = req.query.page != undefined ? parseInt(req.query.page) : undefined;
+    const deleted: number = req.query.deleted != undefined ? parseInt(req.query.deleted) : undefined;
+    const correct: number = req.query.correct != undefined ? parseInt(req.query.correct) : undefined;
     const username: string = req.query.username;
     selectAnswer(page, deleted, correct, username).then((success) => {
         res.status(200).json(success);
