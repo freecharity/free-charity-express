@@ -1,5 +1,5 @@
-import {Request, Response} from "express";
-import {Question} from "../models/question";
+import {Request, Response} from 'express';
+import {Question} from '../models/question';
 import {connection} from '../util/database';
 
 /**
@@ -93,7 +93,7 @@ export const post = (req: Request, res: Response) => {
         } else {
             res.status(200).json(results);
         }
-    })
+    });
 };
 
 /**
@@ -139,5 +139,21 @@ export const remove = (req: Request, res: Response) => {
         } else {
             res.status(200).json(results);
         }
-    })
+    });
+};
+
+export const deleteQuestion = (req: Request, res: Response) => {
+    const id = req.query.id;
+    const statement = `
+    DELETE
+    FROM question
+    WHERE question.question_id = ${id};
+  `;
+    connection.query(statement, (error, results) => {
+        if (error) {
+            res.status(400).send(error);
+        } else {
+            res.status(200).send(results);
+        }
+    });
 };

@@ -44,7 +44,7 @@ app.use(cors(corsOptions));
 app.get("/questions", questionController.get);
 app.post("/questions", questionController.post);
 app.put("/questions", questionController.put);
-app.delete("/questions", questionController.remove);
+app.delete('/questions', questionController.deleteQuestion);
 
 app.get("/answers", answerController.get);
 app.post("/answers", answerController.post);
@@ -70,3 +70,5 @@ app.post('/auth/register', authenticationController.registerUser);
 
 
 export default app;
+
+module.exports = app;
