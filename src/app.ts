@@ -44,7 +44,8 @@ app.use(cors(corsOptions));
 app.get("/questions", questionController.get);
 app.post("/questions", questionController.post);
 app.put("/questions", questionController.put);
-app.delete('/questions', questionController.deleteQuestion);
+app.delete('/questions', questionController.remove);
+app.delete('/questions/delete', questionController.deleteForce);
 
 app.get("/answers", answerController.get);
 app.post("/answers", answerController.post);
