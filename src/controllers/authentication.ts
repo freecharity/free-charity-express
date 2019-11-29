@@ -67,6 +67,7 @@ const verifyCredentials = async (user: User): Promise<User> => {
             user.password,
             user.deleted,
             user.avatar,
+            user.administrator,
             user.date_registered
         FROM user
         WHERE username = '${user.username}'
@@ -94,6 +95,7 @@ const retrieveCredentials = async (username: string): Promise<User> => {
             user.password,
             user.deleted,
             user.avatar,
+            user.administrator,
             user.date_registered
         FROM user
         WHERE username = '${username}';

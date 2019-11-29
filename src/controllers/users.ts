@@ -19,17 +19,18 @@ export const get = (req: Request, res: Response) => {
         identifier = ['email', email];
     }
     const sqlQuery = `
-    SELECT user_id,
-        \`username\`,
-        \`email\`,
-        \`password\`,
-        \`avatar\`,
-        \`deleted\`,
-        \`date_registered\`
+    SELECT 
+        user.user_id,
+        user.username,
+        user.email,
+        user.password,
+        user.avatar,
+        user.deleted,
+        user.date_registered
     FROM user
     ${identifier[0] != undefined ? `WHERE ${identifier[0]} = '${identifier[1]}'` : ''}
     ;`;
-    connection.query(sqlQuery, (error, results, fields) => {
+    connection.query(sqlQuery, (error, results) => {
         if (error) {
             res.status(400).send(error);
         } else {
@@ -42,6 +43,7 @@ export const get = (req: Request, res: Response) => {
                     password: results[i].password,
                     deleted: results[i].deleted,
                     avatar: results[i].avatar,
+                    administrator: results[i].administrator,
                     date_registered: results[i].date_registered
                 };
                 users.push(user);

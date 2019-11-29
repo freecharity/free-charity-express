@@ -5,5 +5,6 @@ export interface User {
     password: string;
     avatar: string;
     deleted: number;
+    administrator: number;
     date_registered: string;
 }

@@ -63,27 +63,6 @@ export const get = (req: Request, res: Response) => {
  */
 export const post = (req: Request, res: Response) => {
     const answer: Answer = req.body;
-    // const sqlQuery = `
-    // INSERT INTO answer(
-    //     \`ip\`,
-    //     \`correct\`,
-    //     \`answer\`,
-    //     \`deleted\`,
-    //     \`date_answered\`,
-    //     \`question_id\`,
-    //     \`user_id\`
-    // ) VALUES (
-    //     '${answer.ip}',
-    //     ${answer.correct},
-    //     '${answer.answer}',
-    //     ${answer.deleted},
-    //     '${answer.date_answered}',
-    //     ${answer.question_id},
-    //     (SELECT user.user_id
-    //     FROM user
-    //     WHERE user.username = ${answer.username})
-    // );
-    // `;
     const sqlQuery = `
     INSERT INTO answer(
         answer.ip,
