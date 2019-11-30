@@ -9,7 +9,6 @@ export const selectUser = (page: number, userId: number, username: string, email
             user.email,
             user.password,
             user.avatar,
-            user.deleted,
             user.date_registered
         FROM user
         ${userId != undefined ? `WHERE user.user_id = ${userId}`
@@ -60,7 +59,7 @@ export const insertUser = (user: User): Promise<any> => {
 
 export const updateUser = (user: User): Promise<any> => {
     return new Promise((resolve, reject) => {
-        const sqlQuery = `
+        const statement = `
         UPDATE user
         SET user.username = '${user.username}',
             user.email = '${user.email}',
@@ -69,7 +68,7 @@ export const updateUser = (user: User): Promise<any> => {
             user.date_registered = '${user.date_registered}'
         WHERE user_id = ${user.user_id};
         `;
-        connection.query(sqlQuery, (error, results) => {
+        connection.query(statement, (error, results) => {
             if (error) {
                 reject(error);
             } else {
@@ -79,12 +78,13 @@ export const updateUser = (user: User): Promise<any> => {
     });
 };
 
-export const deleteUser = (userId: number): Promise<any> => {
+export const deleteUser = (userIds: string[]): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `
         DELETE
         FROM user
-        WHERE user.user_id = ${userId};
+        WHERE user.user_id 
+        IN (${userIds.toString()});
         `;
         connection.query(statement, (error, results) => {
             if (error) {
@@ -104,7 +104,6 @@ const parseUsersFromResults = (results: any): User[] => {
             username: results[i].username,
             email: results[i].email,
             password: results[i].password,
-            deleted: results[i].deleted,
             avatar: results[i].avatar,
             administrator: results[i].administrator,
             date_registered: results[i].date_registered

@@ -34,7 +34,6 @@ const user: User = {
     email: 'test_answer_email@test.com',
     password: 'test_password',
     avatar: 'avatar_1',
-    deleted: 0,
     administrator: 0,
     date_registered: new Date().toISOString()
 };
@@ -67,8 +66,8 @@ beforeAll(async () => {
 
 afterAll(async () => {
     await deleteQuestion([question.question_id.toString()]);
-    await deleteCategory(category.category_id);
-    await deleteUser(user.user_id);
+    await deleteCategory([category.category_id.toString()]);
+    await deleteUser([user.user_id.toString()]);
 });
 
 it('Posts an answer', async done => {

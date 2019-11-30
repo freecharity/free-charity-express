@@ -10,7 +10,6 @@ const user: User = {
     email: 'test_email@test.com',
     password: 'test_password',
     avatar: '1',
-    deleted: 0,
     administrator: 1,
     date_registered: new Date().toISOString()
 };
