@@ -10,7 +10,7 @@ import * as answerController from './controllers/answers';
 import * as categoryController from './controllers/categories';
 import * as userController from './controllers/users';
 import * as quizController from './controllers/quiz';
-import * as authenticationController from './controllers/authentication';
+import * as authenticationController from './controllers/auth';
 
 // Create Express server
 const app = express();
@@ -59,12 +59,16 @@ app.post('/users', userController.post);
 app.put('/users', userController.put);
 app.delete('/users', userController.remove);
 
+app.post('/auth/login', authenticationController.login);
+app.post('/auth/register', authenticationController.register);
+app.post('/auth/validate', authenticationController.validate);
+app.post('/auth/logout', authenticationController.logout);
+
+// TODO: Add Quiz Tests
 app.get('/quiz', quizController.get);
 
-app.post('/auth/login', authenticationController.loginUser);
-app.post('/auth/logout', authenticationController.logoutUser);
-app.post('/auth/validate', authenticationController.validateUser);
-app.post('/auth/register', authenticationController.registerUser);
+// TODO: Add Leaderboard Tests
+
 
 export default app;
 

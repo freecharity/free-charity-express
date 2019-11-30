@@ -45,7 +45,7 @@ const answer: Answer = {
     ip: 'test.ip.address',
     date_answered: new Date().toISOString(),
     question_id: question.question_id,
-    user_id: 2, // TODO Mock User Id
+    user_id: -1
 };
 
 beforeAll(async () => {

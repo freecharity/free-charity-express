@@ -1,6 +1,6 @@
-import {Request, Response} from "express";
-import {connection} from "../util/database";
-import {Question} from "../models/question";
+import {Request, Response} from 'express';
+import {connection} from '../util/database';
+import {Question} from '../models/question';
 
 /*
  * GET localhost:3000/quiz?categoryName={categoryName}
@@ -37,9 +37,7 @@ export const get = (req: Request, res: Response) => {
                     incorrect_1: results[i].incorrect_1,
                     incorrect_2: results[i].incorrect_2,
                     incorrect_3: results[i].incorrect_3,
-                    deleted: results[i].deleted,
-                    category_id: results[i].category_id,
-                    category_name: results[i].category_name
+                    category_id: results[i].category_id
                 };
                 questions.push(question);
             }

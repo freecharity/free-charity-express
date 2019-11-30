@@ -9,6 +9,7 @@ export const selectUser = (page: number, userId: number, username: string, email
             user.email,
             user.password,
             user.avatar,
+            user.administrator,
             user.date_registered
         FROM user
         ${userId != undefined ? `WHERE user.user_id = ${userId}`
