@@ -53,9 +53,7 @@ app.delete('/questions', questionController.remove);
 app.get('/answers', answerController.get);
 app.post('/answers', answerController.post);
 app.put('/answers', answerController.put);
-// app.delete("/answers", answerController.remove);
-app.delete('/answers', answerController.deleteForce);
-app.delete('/answers/multiple', answerController.deleteMultipleForce);
+app.delete('/answers', answerController.remove);
 
 app.get('/categories', categoryController.get);
 app.post('/categories', categoryController.post);

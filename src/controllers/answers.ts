@@ -1,18 +1,16 @@
 import {Request, Response} from 'express';
 import {Answer} from '../models/answer';
-import {connection} from '../util/database';
-import {deleteAnswer, deleteAnswers, insertAnswer, selectAnswer, updateAnswer} from '../database/answers';
+import {deleteAnswers, insertAnswer, selectAnswer, updateAnswer} from '../database/answers';
 
 /**
- * GET /answers?page={1}&deleted={0}&correct={0}
- * GET /answers?page={1}&deleted={0}&correct={0}&username={'jason'}
+ * GET /answers/
+ * Retrieve answers from database
  */
 export const get = (req: Request, res: Response) => {
     const page: number = req.query.page != undefined ? parseInt(req.query.page) : undefined;
-    const deleted: number = req.query.deleted != undefined ? parseInt(req.query.deleted) : undefined;
     const correct: number = req.query.correct != undefined ? parseInt(req.query.correct) : undefined;
     const username: string = req.query.username;
-    selectAnswer(page, deleted, correct, username).then((success) => {
+    selectAnswer(page, correct, username).then((success) => {
         res.status(200).json(success);
     }).catch((error) => {
         res.status(400).json(error);
@@ -47,38 +45,13 @@ export const put = (req: Request, res: Response) => {
 
 /**
  * DELETE /answers/
- * Update an answer record with the following id
+ * Delete records by id from database
  */
 export const remove = (req: Request, res: Response) => {
-    const answerId = req.query.answerId;
-    const sqlQuery = `
-    UPDATE answer
-    SET deleted = 1
-    WHERE answer_id = ${answerId};
-  `;
-    connection.query(sqlQuery, (error, results) => {
-        if (error) {
-            res.status(400).send(error);
-        } else {
-            res.status(200).send(results);
-        }
-    });
-};
-
-export const deleteForce = (req: Request, res: Response) => {
-    const answerId = req.query.answerId;
-    deleteAnswer(answerId).then((success) => {
-        res.status(200).json(success);
+    const answerIds = req.query.ids;
+    deleteAnswers(answerIds).then((response) => {
+        res.status(200).send(response);
     }).catch((error) => {
-        res.status(400).json(error);
-    });
-};
-
-export const deleteMultipleForce = (req: Request, res: Response) => {
-    const answerIds: string[] = req.query.answerIds;
-    deleteAnswers(answerIds).then((success) => {
-        res.status(200).json(success);
-    }).catch((error) => {
-        res.status(400).json(error);
-    });
+        res.status(400).send(error);
+    })
 };

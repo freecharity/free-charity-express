@@ -1,10 +1,12 @@
 import app from '../app';
 import supertest, {Response} from 'supertest';
+import {Category} from '../models/category';
 import {Question} from '../models/question';
 import {Answer} from '../models/answer';
-import {Category} from '../models/category';
-import {deleteQuestion, insertQuestion} from '../database/questions';
+import {User} from '../models/user';
 import {deleteCategory, insertCategory} from '../database/categories';
+import {deleteQuestion, insertQuestion} from '../database/questions';
+import {deleteUser, insertUser} from '../database/users';
 
 const request = supertest(app);
 
@@ -13,7 +15,7 @@ const category: Category = {
     name: 'test_answer_category',
     group: 'test_category_group',
     description: 'this category is for testing the answers endpoint',
-    image: '1'
+    image: 'category_1'
 };
 
 const question: Question = {
@@ -23,39 +25,50 @@ const question: Question = {
     incorrect_1: 'test_incorrect_1',
     incorrect_2: 'test_incorrect_2',
     incorrect_3: 'test_incorrect_3',
-    deleted: 0,
-    category_name: '',
     category_id: -1
+};
+
+const user: User = {
+    user_id: -1,
+    username: 'test_answer_user',
+    email: 'test_answer_email@test.com',
+    password: 'test_password',
+    avatar: 'avatar_1',
+    deleted: 0,
+    administrator: 0,
+    date_registered: new Date().toISOString()
 };
 
 const answer: Answer = {
     answer_id: -1,
     answer: 'test_answer',
     correct: 1,
-    deleted: 0,
     ip: 'test.ip.address',
     date_answered: new Date().toISOString(),
     question_id: question.question_id,
     user_id: 2, // TODO Mock User Id
-    username: 'jason' // TODO: Mock Username
 };
 
 beforeAll(async () => {
     await insertCategory(category).then(async (response) => {
         category.category_id = response.insertId;
         question.category_id = category.category_id;
-        question.category_name = category.name;
-        await insertQuestion(question).then((response) => {
+        await insertQuestion(question).then(async (response) => {
             question.question_id = response.insertId;
             answer.question_id = question.question_id;
+            await insertUser(user).then(async (response) => {
+                user.user_id = response.insertId;
+                answer.user_id = user.user_id;
+            });
         });
     });
 
 });
 
 afterAll(async () => {
-    await deleteQuestion(question.question_id);
+    await deleteQuestion([question.question_id.toString()]);
     await deleteCategory(category.category_id);
+    await deleteUser(user.user_id);
 });
 
 it('Posts an answer', async done => {
@@ -70,13 +83,6 @@ it('Selects answers', async done => {
     expect(response.status).toBe(200);
     expect(response.body.page).toBe(1);
     expect(response.body.results.length).toBeGreaterThan(0);
-    done();
-});
-
-it('Selects answers that are deleted', async done => {
-    const response: Response = await request.get('/answers?page=1&deleted=1&correct=0');
-    expect(response.body.page).toBe(1);
-    expect(response.status).toBe(200);
     done();
 });
 
@@ -96,7 +102,8 @@ it('Updates an answer', async done => {
 });
 
 it('Deletes an answer', async done => {
-    const response: Response = await request.delete(`/answers?answerId=${answer.answer_id}`);
+    const answerIds = [answer.answer_id.toString()];
+    const response: Response = await request.delete(`/answers?ids=${answerIds}`);
     expect(response.status).toBe(200);
     expect(response.body.affectedRows).toBe(1);
     done();
