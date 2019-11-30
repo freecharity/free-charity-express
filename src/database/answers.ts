@@ -119,3 +119,21 @@ export const deleteAnswer = (answerId: number): Promise<any> => {
         });
     });
 };
+
+export const deleteAnswers = (answerIds: string[]): Promise<any> => {
+    return new Promise((resolve, reject) => {
+        const statement = `
+        DELETE
+        FROM answer
+        WHERE answer.answer_id
+        IN (${answerIds.toString()}); 
+        `;
+        connection.query(statement, (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+};

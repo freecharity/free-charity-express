@@ -10,10 +10,7 @@ export const get = (req: Request, res: Response) => {
     const page: number = req.query.page != undefined ? parseInt(req.query.page) : undefined;
     const categoryId: number = req.query.categoryId != undefined ? parseInt(req.query.categoryId) : undefined;
     const categoryName: string = req.query.categoryName;
-    const deleted: boolean = (req.query.showDeleted == 'true')
-        || categoryName != undefined
-        || categoryId != undefined;
-    selectCategories(page, deleted, categoryName, categoryId).then((response) => {
+    selectCategories(page, categoryName, categoryId).then((response) => {
         res.status(200).json(response);
     }).catch((error) => {
         res.status(400).json(error);

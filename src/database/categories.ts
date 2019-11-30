@@ -1,7 +1,7 @@
 import {connection} from '../util/database';
 import {Category} from '../models/category';
 
-export const selectCategories = (page: number, deleted: boolean, category: string, categoryId: number): Promise<any> => {
+export const selectCategories = (page: number, category: string, categoryId: number): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `
         SELECT category.category_id,
@@ -10,10 +10,9 @@ export const selectCategories = (page: number, deleted: boolean, category: strin
             category.description,
             category.image
         FROM category
-        WHERE deleted != ${deleted ? 2 : 1}
-        ${category != undefined ? `AND name = '${category}'` : ''}
-        ${categoryId != undefined ? `AND category_id = '${categoryId}'` : ''}
-        ;`;
+        ${category != undefined ? `WHERE name = '${category}'` : ''}
+        ${categoryId != undefined ? `WHERE category_id = '${categoryId}'` : ''};
+        `;
         connection.query(statement, (error, results) => {
             if (error) {
                 reject(error);

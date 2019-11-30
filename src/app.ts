@@ -38,6 +38,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors(corsOptions));
 
+// TODO: Ensure that all CRUD routes only have get, post, put, and delete methods
+// TODO: Update all deleted methods to use multi-id delete
+// TODO: Use a different authentication method (Passport.js  + OAuth)
+
 /**
  * Server routes.
  */
@@ -45,13 +49,13 @@ app.get('/questions', questionController.get);
 app.post('/questions', questionController.post);
 app.put('/questions', questionController.put);
 app.delete('/questions', questionController.remove);
-app.delete('/questions/delete', questionController.deleteForce);
 
 app.get('/answers', answerController.get);
 app.post('/answers', answerController.post);
 app.put('/answers', answerController.put);
 // app.delete("/answers", answerController.remove);
 app.delete('/answers', answerController.deleteForce);
+app.delete('/answers/multiple', answerController.deleteMultipleForce);
 
 app.get('/categories', categoryController.get);
 app.post('/categories', categoryController.post);

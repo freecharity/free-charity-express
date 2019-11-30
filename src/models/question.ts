@@ -6,6 +6,4 @@ export interface Question {
     incorrect_2: string;
     incorrect_3: string;
     category_id: number;
-    category_name: string;
-    deleted: number;
 }

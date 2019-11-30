@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {Answer} from '../models/answer';
 import {connection} from '../util/database';
-import {deleteAnswer, insertAnswer, selectAnswer, updateAnswer} from '../database/answers';
+import {deleteAnswer, deleteAnswers, insertAnswer, selectAnswer, updateAnswer} from '../database/answers';
 
 /**
  * GET /answers?page={1}&deleted={0}&correct={0}
@@ -68,6 +68,15 @@ export const remove = (req: Request, res: Response) => {
 export const deleteForce = (req: Request, res: Response) => {
     const answerId = req.query.answerId;
     deleteAnswer(answerId).then((success) => {
+        res.status(200).json(success);
+    }).catch((error) => {
+        res.status(400).json(error);
+    });
+};
+
+export const deleteMultipleForce = (req: Request, res: Response) => {
+    const answerIds: string[] = req.query.answerIds;
+    deleteAnswers(answerIds).then((success) => {
         res.status(200).json(success);
     }).catch((error) => {
         res.status(400).json(error);
