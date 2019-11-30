@@ -56,10 +56,10 @@ describe('Test auth controller', () => {
         expect(response.body.user.email).toBe(user.email);
         expect(response.body.user.avatar).toBe(user.avatar);
         expect(response.body.user.administrator).toBe(user.administrator);
-        expect(response.body.session.length).toBeGreaterThan(0);
+        expect(response.body.sessionId.length).toBeGreaterThan(0);
         // update local session
         session.username = user.username;
-        session.sessionId = response.body.session;
+        session.sessionId = response.body.sessionId;
         done();
     });
 

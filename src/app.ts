@@ -66,6 +66,7 @@ app.post('/auth/logout', authenticationController.logout);
 
 // TODO: Add Quiz Tests
 app.get('/quiz', quizController.get);
+app.post('/quiz', quizController.post);
 
 // TODO: Add Leaderboard Tests
 

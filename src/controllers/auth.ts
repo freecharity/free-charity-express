@@ -10,8 +10,8 @@ export const login = (req: Request, res: Response) => {
     const username: string = req.body.username;
     const password: string = req.body.password;
     loginUser(username, password).then((user) => {
-        const session = userSession.addUserSession(user);
-        res.status(200).json({user, session});
+        const sessionId = userSession.addUserSession(user);
+        res.status(200).json({user, sessionId});
     }).catch((error) => {
         res.status(400).json(error);
     });
