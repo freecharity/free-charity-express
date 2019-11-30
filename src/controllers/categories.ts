@@ -44,12 +44,12 @@ export const put = (req: Request, res: Response) => {
 };
 
 /**
- * DELETE /categories?id={id}
- * Delete a category record with the following id
+ * DELETE /categories/
+ * Delete category records with the following id
  */
 export const remove = (req: Request, res: Response) => {
-    const categoryId = req.query.id;
-    deleteCategory(categoryId).then((response) => {
+    const categoryIds: string[] = req.query.ids;
+    deleteCategory(categoryIds).then((response) => {
         res.status(200).send(response);
     }).catch((error) => {
         res.status(400).send(error);

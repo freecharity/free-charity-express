@@ -40,7 +40,8 @@ it('Updates a category', async done => {
 
 it('Deletes a category', async done => {
     // Sends DELETE Request to /categories?id=${category.category_id}
-    const response: Response = await request.delete(`/categories?id=${category.category_id}`);
+    const categoryIds: string[] = [category.category_id.toString()];
+    const response: Response = await request.delete(`/categories?ids=${categoryIds.toString()}`);
     expect(response.status).toBe(200);
     expect(response.body.affectedRows).toBe(1);
     done();

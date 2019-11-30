@@ -55,7 +55,7 @@ export const insertCategory = (category: Category): Promise<any> => {
 
 export const updateCategory = (category: Category): Promise<any> => {
     return new Promise((resolve, reject) => {
-        const sqlQuery = `
+        const statement = `
         UPDATE category
         SET category.name = '${category.name}',
             category.group = '${category.group}',
@@ -63,7 +63,7 @@ export const updateCategory = (category: Category): Promise<any> => {
             category.image = '${category.image}'
         WHERE category.category_id = ${category.category_id}
         ;`;
-        connection.query(sqlQuery, (error, results) => {
+        connection.query(statement, (error, results) => {
             if (error) {
                 reject(error);
             } else {
@@ -73,12 +73,13 @@ export const updateCategory = (category: Category): Promise<any> => {
     });
 };
 
-export const deleteCategory = (categoryId: number): Promise<any> => {
+export const deleteCategory = (categoryIds: string[]): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `
         DELETE
         FROM category
-        WHERE category.category_id = ${categoryId};
+        WHERE category.category_id
+        IN (${categoryIds.toString()});
         `;
         connection.query(statement, (error, results) => {
             if (error) {
