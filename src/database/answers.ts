@@ -51,6 +51,26 @@ export const selectAnswerCount = (correct: number): Promise<number> => {
     });
 };
 
+export const selectAnswerCountByUser = (correct: number, username: string): Promise<number> => {
+    return new Promise<number>((resolve, reject) => {
+        const statement = `
+        SELECT COUNT(answer.user_id) as answerCount, user.username
+        FROM answer,
+             user
+        WHERE answer.user_id = user.user_id
+          AND answer.correct = ${correct}
+          AND user.username = '${username}';
+        `;
+        connection.query(statement, (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results[0]);
+            }
+        });
+    });
+};
+
 export const insertAnswer = (answer: Answer): Promise<any> => {
     return new Promise((resolve, reject) => {
         const sqlQuery = `

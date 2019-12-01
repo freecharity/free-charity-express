@@ -93,6 +93,13 @@ describe('Tests answers endpoint', () => {
         done();
     });
 
+    it('Selects correct answer count by username', async done => {
+        const response: Response = await request.get(`/answers/count/username?correct=1&username=${user.username}`);
+        expect(response.status).toBe(200);
+        expect(response.body.answerCount).toBeGreaterThan(0);
+        done();
+    });
+
     it('Selects answers that are correct', async done => {
         const response: Response = await request.get('/answers?page=1&deleted=0&correct=1');
         expect(response.body.page).toBe(1);

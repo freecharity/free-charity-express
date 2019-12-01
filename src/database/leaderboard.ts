@@ -4,8 +4,11 @@ import {Leaderboard, LeaderboardMember} from '../models/leaderboard';
 export const selectLeaderboard = (count: number): Promise<Leaderboard> => {
     return new Promise<Leaderboard>((resolve, reject) => {
         const statement = `
-        SELECT COUNT(*) as score, user.username
-        FROM answer, user
+        SELECT COUNT(*) as score,
+               user.username,
+               user.avatar
+        FROM answer,
+             user
         WHERE answer.user_id = user.user_id
         GROUP BY answer.user_id
         ORDER BY score DESC
@@ -29,7 +32,8 @@ const parseLeaderboardFromResults = (results: any): Leaderboard => {
     for (let i = 0; i < results.length; i++) {
         const member: LeaderboardMember = {
             username: results[i].username,
-            score: results[i].score * 10
+            score: results[i].score * 10,
+            avatar: results[i].avatar
         };
         leaderboard.members.push(member);
     }

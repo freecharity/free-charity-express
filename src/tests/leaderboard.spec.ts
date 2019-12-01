@@ -9,4 +9,4 @@ describe('Test leaderboard endpoints', () => {
         expect(response.status).toBe(200);
         expect(response.body.members).not.toBeNull();
     });
-}); 
+});

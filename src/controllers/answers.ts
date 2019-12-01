@@ -1,6 +1,13 @@
 import {Request, Response} from 'express';
 import {Answer} from '../models/answer';
-import {deleteAnswers, insertAnswer, selectAnswer, selectAnswerCount, updateAnswer} from '../database/answers';
+import {
+    deleteAnswers,
+    insertAnswer,
+    selectAnswer,
+    selectAnswerCount,
+    selectAnswerCountByUser,
+    updateAnswer
+} from '../database/answers';
 
 /**
  * GET /answers/
@@ -24,6 +31,20 @@ export const get = (req: Request, res: Response) => {
 export const getCount = (req: Request, res: Response) => {
     const correct: number = req.query.correct != undefined ? parseInt(req.query.correct) : undefined;
     selectAnswerCount(correct).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
+    });
+};
+
+/**
+ * GET /answers/count/username
+ * Retrieves number of answers from database
+ */
+export const getCountUsername = (req: Request, res: Response) => {
+    const correct: number = req.query.correct != undefined ? parseInt(req.query.correct) : undefined;
+    const username: string = req.query.username;
+    selectAnswerCountByUser(correct, username).then((response) => {
         res.status(200).json(response);
     }).catch((error) => {
         res.status(400).json(error);

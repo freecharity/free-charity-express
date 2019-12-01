@@ -5,4 +5,5 @@ export interface Leaderboard {
 export interface LeaderboardMember {
     username: string;
     score: number;
+    avatar: string;
 }

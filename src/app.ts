@@ -12,6 +12,7 @@ import * as userController from './controllers/users';
 import * as quizController from './controllers/quiz';
 import * as authenticationController from './controllers/auth';
 import * as leaderboardController from './controllers/leaderboard';
+import * as donationController from './controllers/donation';
 
 // Create Express server
 const app = express();
@@ -47,6 +48,7 @@ app.delete('/questions', questionController.remove);
 
 app.get('/answers', answerController.get);
 app.get('/answers/count', answerController.getCount);
+app.get('/answers/count/username', answerController.getCountUsername);
 app.post('/answers', answerController.post);
 app.put('/answers', answerController.put);
 app.delete('/answers', answerController.remove);
@@ -71,6 +73,9 @@ app.get('/quiz', quizController.get);
 app.post('/quiz', quizController.post);
 
 app.get('/leaderboard', leaderboardController.get);
+
+app.get('/donation', donationController.get);
+app.get('/donation/total', donationController.getTotal);
 
 export default app;
 
