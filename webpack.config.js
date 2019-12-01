@@ -15,7 +15,7 @@ module.exports = {
   },
   devtool: 'source-map',
   optimization: {
-    minimize: true
+    minimize: false // mysql doesn't like optimization :'(
   },
   plugins: [
     new CleanWebpackPlugin(),
