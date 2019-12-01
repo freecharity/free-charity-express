@@ -32,6 +32,22 @@ export const selectUser = (page: number, userId: number, username: string, email
     });
 };
 
+export const selectUserCount = (): Promise<number> => {
+    return new Promise((resolve, reject) => {
+        const statement = `
+        SELECT COUNT(*) as userCount
+        FROM user;
+        `;
+        connection.query(statement, (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results[0]);
+            }
+        });
+    });
+};
+
 export const insertUser = (user: User): Promise<any> => {
     return new Promise((resolve, reject) => {
         const statement = `

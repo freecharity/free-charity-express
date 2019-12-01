@@ -11,6 +11,7 @@ import * as categoryController from './controllers/categories';
 import * as userController from './controllers/users';
 import * as quizController from './controllers/quiz';
 import * as authenticationController from './controllers/auth';
+import * as leaderboardController from './controllers/leaderboard';
 
 // Create Express server
 const app = express();
@@ -45,6 +46,7 @@ app.put('/questions', questionController.put);
 app.delete('/questions', questionController.remove);
 
 app.get('/answers', answerController.get);
+app.get('/answers/count', answerController.getCount);
 app.post('/answers', answerController.post);
 app.put('/answers', answerController.put);
 app.delete('/answers', answerController.remove);
@@ -55,6 +57,7 @@ app.put('/categories', categoryController.put);
 app.delete('/categories', categoryController.remove);
 
 app.get('/users', userController.get);
+app.get('/users/count', userController.getCount);
 app.post('/users', userController.post);
 app.put('/users', userController.put);
 app.delete('/users', userController.remove);
@@ -64,12 +67,10 @@ app.post('/auth/register', authenticationController.register);
 app.post('/auth/validate', authenticationController.validate);
 app.post('/auth/logout', authenticationController.logout);
 
-// TODO: Add Quiz Tests
 app.get('/quiz', quizController.get);
 app.post('/quiz', quizController.post);
 
-// TODO: Add Leaderboard Tests
-
+app.get('/leaderboard', leaderboardController.get);
 
 export default app;
 

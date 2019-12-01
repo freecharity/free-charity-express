@@ -34,6 +34,23 @@ export const selectAnswer = (page: number, correct: number, username?: string): 
     });
 };
 
+export const selectAnswerCount = (correct: number): Promise<number> => {
+    return new Promise<number>((resolve, reject) => {
+        const statement = `
+        SELECT COUNT(*) as answerCount
+        FROM answer
+        WHERE answer.correct = ${correct};
+        `;
+        connection.query(statement, (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results[0]);
+            }
+        });
+    });
+};
+
 export const insertAnswer = (answer: Answer): Promise<any> => {
     return new Promise((resolve, reject) => {
         const sqlQuery = `

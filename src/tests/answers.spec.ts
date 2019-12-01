@@ -48,62 +48,71 @@ const answer: Answer = {
     user_id: -1
 };
 
-beforeAll(async () => {
-    await insertCategory(category).then(async (response) => {
-        category.category_id = response.insertId;
-        question.category_id = category.category_id;
-        await insertQuestion(question).then(async (response) => {
-            question.question_id = response.insertId;
-            answer.question_id = question.question_id;
-            await insertUser(user).then(async (response) => {
-                user.user_id = response.insertId;
-                answer.user_id = user.user_id;
+describe('Tests answers endpoint', () => {
+    beforeAll(async () => {
+        await insertCategory(category).then(async (response) => {
+            category.category_id = response.insertId;
+            question.category_id = category.category_id;
+            await insertQuestion(question).then(async (response) => {
+                question.question_id = response.insertId;
+                answer.question_id = question.question_id;
+                await insertUser(user).then(async (response) => {
+                    user.user_id = response.insertId;
+                    answer.user_id = user.user_id;
+                });
             });
         });
+
     });
 
-});
+    afterAll(async () => {
+        await deleteQuestion([question.question_id.toString()]);
+        await deleteCategory([category.category_id.toString()]);
+        await deleteUser([user.user_id.toString()]);
+    });
 
-afterAll(async () => {
-    await deleteQuestion([question.question_id.toString()]);
-    await deleteCategory([category.category_id.toString()]);
-    await deleteUser([user.user_id.toString()]);
-});
+    it('Posts an answer', async done => {
+        const response: Response = await request.post('/answers').send(answer);
+        expect(response.status).toBe(200);
+        answer.answer_id = response.body.insertId;
+        done();
+    });
 
-it('Posts an answer', async done => {
-    const response: Response = await request.post('/answers').send(answer);
-    expect(response.status).toBe(200);
-    answer.answer_id = response.body.insertId;
-    done();
-});
+    it('Selects answers', async done => {
+        const response: Response = await request.get('/answers?page=1&deleted=0&correct=0');
+        expect(response.status).toBe(200);
+        expect(response.body.page).toBe(1);
+        expect(response.body.results.length).toBeGreaterThan(0);
+        done();
+    });
 
-it('Selects answers', async done => {
-    const response: Response = await request.get('/answers?page=1&deleted=0&correct=0');
-    expect(response.status).toBe(200);
-    expect(response.body.page).toBe(1);
-    expect(response.body.results.length).toBeGreaterThan(0);
-    done();
-});
+    it('Selects correct answer count', async done => {
+        const response: Response = await request.get('/answers/count?correct=1');
+        expect(response.status).toBe(200);
+        expect(response.body.answerCount).toBeGreaterThan(0);
+        done();
+    });
 
-it('Selects answers that are correct', async done => {
-    const response: Response = await request.get('/answers?page=1&deleted=0&correct=1');
-    expect(response.body.page).toBe(1);
-    expect(response.status).toBe(200);
-    done();
-});
+    it('Selects answers that are correct', async done => {
+        const response: Response = await request.get('/answers?page=1&deleted=0&correct=1');
+        expect(response.body.page).toBe(1);
+        expect(response.status).toBe(200);
+        done();
+    });
 
-it('Updates an answer', async done => {
-    answer.answer = 'test_question_updated_answer';
-    const response: Response = await request.put('/answers').send(answer);
-    expect(response.status).toBe(200);
-    expect(response.body.affectedRows).toBe(1);
-    done();
-});
+    it('Updates an answer', async done => {
+        answer.answer = 'test_question_updated_answer';
+        const response: Response = await request.put('/answers').send(answer);
+        expect(response.status).toBe(200);
+        expect(response.body.affectedRows).toBe(1);
+        done();
+    });
 
-it('Deletes an answer', async done => {
-    const answerIds = [answer.answer_id.toString()];
-    const response: Response = await request.delete(`/answers?ids=${answerIds}`);
-    expect(response.status).toBe(200);
-    expect(response.body.affectedRows).toBe(1);
-    done();
+    it('Deletes an answer', async done => {
+        const answerIds = [answer.answer_id.toString()];
+        const response: Response = await request.delete(`/answers?ids=${answerIds}`);
+        expect(response.status).toBe(200);
+        expect(response.body.affectedRows).toBe(1);
+        done();
+    });
 });

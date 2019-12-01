@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {Answer} from '../models/answer';
-import {deleteAnswers, insertAnswer, selectAnswer, updateAnswer} from '../database/answers';
+import {deleteAnswers, insertAnswer, selectAnswer, selectAnswerCount, updateAnswer} from '../database/answers';
 
 /**
  * GET /answers/
@@ -18,15 +18,28 @@ export const get = (req: Request, res: Response) => {
 };
 
 /**
+ * GET /answers/count/
+ * Retrieves number of answers from database
+ */
+export const getCount = (req: Request, res: Response) => {
+    const correct: number = req.query.correct != undefined ? parseInt(req.query.correct) : undefined;
+    selectAnswerCount(correct).then((response) => {
+        res.status(200).json(response);
+    }).catch((error) => {
+        res.status(400).json(error);
+    });
+};
+
+/**
  * POST /answers/
  * Insert an answer record into database
  */
 export const post = (req: Request, res: Response) => {
     const answer: Answer = req.body;
-    insertAnswer(answer).then(success => {
-        res.status(200).send(success);
+    insertAnswer(answer).then(response => {
+        res.status(200).json(response);
     }).catch((error) => {
-        res.status(400).send(error);
+        res.status(400).json(error);
     });
 };
 
@@ -37,9 +50,9 @@ export const post = (req: Request, res: Response) => {
 export const put = (req: Request, res: Response) => {
     const answer: Answer = req.body;
     updateAnswer(answer).then((response) => {
-        res.status(200).send(response);
+        res.status(200).json(response);
     }).catch((error) => {
-        res.status(400).send(error);
+        res.status(400).json(error);
     });
 };
 
@@ -50,8 +63,8 @@ export const put = (req: Request, res: Response) => {
 export const remove = (req: Request, res: Response) => {
     const answerIds = req.query.ids;
     deleteAnswers(answerIds).then((response) => {
-        res.status(200).send(response);
+        res.status(200).json(response);
     }).catch((error) => {
-        res.status(400).send(error);
+        res.status(400).json(error);
     })
 };

@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
 import {User} from '../models/user';
-import {deleteUser, insertUser, selectUser, updateUser} from '../database/users';
+import {deleteUser, insertUser, selectUser, selectUserCount, updateUser} from '../database/users';
 
 /**
  * GET /users/
@@ -12,6 +12,18 @@ export const get = (req: Request, res: Response) => {
     const username: string = req.query.username;
     const email: string = req.query.email;
     selectUser(page, id, username, email).then((response) => {
+        res.status(200).send(response);
+    }).catch((error) => {
+        res.status(400).send(error);
+    });
+};
+
+/**
+ * GET /users/count/
+ * Retrieve all users from database
+ */
+export const getCount = (req: Request, res: Response) => {
+    selectUserCount().then((response) => {
         res.status(200).send(response);
     }).catch((error) => {
         res.status(400).send(error);

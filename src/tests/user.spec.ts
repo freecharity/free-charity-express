@@ -54,6 +54,13 @@ describe('Test user endpoints', () => {
         done();
     });
 
+    it('Gets user count', async done => {
+        const response: Response = await request.get('/users/count/');
+        expect(response.status).toBe(200);
+        expect(response.body.userCount).toBeGreaterThan(0);
+        done();
+    });
+
     it('Updates a users username', async done => {
         user.username += '_updated';
         const response: Response = await request.put('/users').send(user);
