@@ -32,7 +32,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    await deleteCategory(category.category_id);
+    await deleteCategory([category.category_id.toString()]);
 });
 
 it('Posts a question', async done => {
