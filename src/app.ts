@@ -19,16 +19,17 @@ const app = express();
 
 // Domain Whitelist
 const whitelist = [
-    'http://localhost:8080'
+    'http://localhost:8080',
+    'https://riceshare.com'
 ];
 
 // Cross-Origin Resource Sharing Options
 const corsOptions: CorsOptions = {
     origin: (origin, callback) => {
-        if (whitelist.indexOf(origin) !== -1) {
+        if (origin && whitelist.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            callback(null, false);
+            callback(new Error('Not allowed by CORS'));
         }
     }
 };
@@ -41,7 +42,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors(corsOptions));
 
 // Server Routes
-app.get('/questions', questionController.get);
+app.get('/questions', cors(corsOptions), questionController.get);
 app.post('/questions', questionController.post);
 app.put('/questions', questionController.put);
 app.delete('/questions', questionController.remove);
