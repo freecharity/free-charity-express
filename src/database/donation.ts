@@ -1,5 +1,6 @@
 import {connection} from '../util/database';
 import {Donation} from '../models/donation';
+import Payment from "../models/payment";
 
 export const selectDonations = (count: number): Promise<Donation[]> => {
     return new Promise<Donation[]>((resolve, reject) => {
@@ -36,6 +37,28 @@ export const selectDonationTotal = (): Promise<number> => {
                 reject(error);
             } else {
                 resolve(results[0]);
+            }
+        });
+    });
+};
+
+export const insertDonation = (payment: Payment): Promise<Donation> => {
+    return new Promise<Donation>((resolve, reject) => {
+        const statement = `
+            INSERT INTO donation(username,
+                     amount,
+                     date_donated,
+                     user_id)
+            VALUES ('${payment.name}',
+                    ${payment.amount},
+                    '${new Date().toISOString()}',
+                    123)
+        `;
+        connection.query(statement, (error, results) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(results);
             }
         });
     });
