@@ -27,7 +27,7 @@ if (!API_KEY) {
 export const PORT = process.env["PORT"];
 
 if (!PORT) {
-  logger.error("No port specified. Set PORT environmental varible.");
+  logger.error("No port specified. Set PORT environmental variable.");
   process.exit(1);
 }
 
@@ -37,3 +37,10 @@ export const DATABASE = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE
 };
+
+export const STRIPE_KEY = prod ? process.env.SK_LIVE : process.env.SK_TEST;
+
+if (!STRIPE_KEY) {
+  logger.error("No stripe secret. Set STRIPE_KEY environment variable.");
+  process.exit(1);
+}

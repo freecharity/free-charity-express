@@ -43,7 +43,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors(corsOptions));
 
 // Server Routes
-app.get('/questions', cors(corsOptions), questionController.get);
+app.get('/questions', questionController.get);
 app.post('/questions', questionController.post);
 app.put('/questions', questionController.put);
 app.delete('/questions', questionController.remove);
@@ -78,6 +78,7 @@ app.get('/leaderboard', leaderboardController.get);
 
 app.get('/donation', donationController.get);
 app.get('/donation/total', donationController.getTotal);
+app.post('/donation', donationController.post);
 
 export default app;
 
