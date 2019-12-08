@@ -1,5 +1,6 @@
+const supertest = require('supertest');
 import app from '../app';
-import supertest, {Response} from 'supertest';
+import {Response} from 'supertest';
 import {User} from '../models/user';
 import {deleteUser} from '../database/users';
 import {Session} from '../models/session';

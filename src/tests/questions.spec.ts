@@ -1,5 +1,6 @@
+const supertest = require('supertest');
 import app from '../app';
-import supertest, {Response} from 'supertest';
+import {Response} from 'supertest';
 import {Question} from '../models/question';
 import {Category} from '../models/category';
 import {deleteCategory, insertCategory} from '../database/categories';
