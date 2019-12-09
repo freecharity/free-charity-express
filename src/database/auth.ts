@@ -1,44 +1,56 @@
-import {connection} from '../util/database';
-import {insertUser, selectUser} from './users';
+import {selectUser} from './users';
 import {userSession} from '../util/userSession';
-import {User} from '../models/user';
+import {User, UserModel} from '../models/user';
 
 export const loginUser = (username: string, password: string): Promise<User> => {
     return new Promise<User>((resolve, reject) => {
-        const statement = `
-        SELECT *
-        FROM user
-        WHERE user.username = '${username}'
-        AND user.password = '${password}';
-        `;
-        connection.query(statement, (error, results) => {
-            if (error) {
-                reject(error);
-            } else if (results.length > 0) {
-                resolve(results[0]);
+        UserModel.findAll({
+            where: {
+                username: username,
+                password: password
+            }
+        }).then((results: any) => {
+            let user = undefined;
+            if (results.length > 0) {
+                user = results[0].dataValues;
+                resolve(user);
             } else {
                 reject({message: 'User with those credentials not found.'});
             }
+        }).catch((error: any) => {
+            reject(error);
         });
     });
 };
 
 export const registerUser = (username: string, password: string, email: string): Promise<User> => {
     return new Promise<User>((resolve, reject) => {
-        const user: User = {
-            user_id: -1,
+        UserModel.create({
             username: username,
             password: password,
             email: email,
             avatar: 'avatar_1',
             administrator: 0,
             date_registered: new Date().toISOString()
-        };
-        insertUser(user).then((response) => {
-            user.user_id = response.insertId;
+        }).then((result: any) => {
+            const user: User = {
+                user_id: result.null,
+                username: result.dataValues.username,
+                password: result.dataValues.password,
+                email: result.dataValues.email,
+                avatar: result.dataValues.avatar,
+                administrator: result.dataValues.administrator,
+                date_registered: result.dataValues.date_registered
+            };
             resolve(user);
-        }).catch((error) => {
-            reject(error);
+        }).catch((error: any) => {
+            if (error.fields && error.fields.username_UNIQUE) {
+                reject({message: "An account with that username already exists!"})
+            } else if (error.fields && error.fields.email_UNIQUE) {
+                reject({message: "An account with that email already exists!"});
+            } else {
+                reject({message: "An unknown error has occurred!", error});
+            }
         });
     });
 };
