@@ -1,6 +1,7 @@
-import mysql from 'mysql';
 import {DATABASE} from './secrets';
+import mysql from 'mysql';
 
+const mysql2 = require('mysql2');
 const Sequelize = require('sequelize');
 
 export const connection = mysql.createPool({
@@ -14,6 +15,7 @@ export const connection = mysql.createPool({
 export const sequelize = new Sequelize(DATABASE.database, DATABASE.user, DATABASE.password, {
     host: DATABASE.host,
     dialect: 'mysql',
+    dialectModule: mysql2,
     pool: {
         max: 50,
         min: 0,
